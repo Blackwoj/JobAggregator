@@ -76,4 +76,4 @@ jobs:
 
       - name: Uruchom pylint
         run: |
-          python ./ci/jobs/pylint_ci.py
+          python ./ci/jobs/pylint_ci.py 
