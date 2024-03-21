@@ -1,6 +1,7 @@
+import glob
 import os
 import sys
-import glob
+
 import pylint.lint
 from badge_generator import generate_badge
 
@@ -9,8 +10,7 @@ job_name = "pylint"
 
 def pylint_run():
     modules = glob.glob('./**/*.py')
-    pylint_opts = ['--rcfile=setup.cfg']  # Przekazanie pliku konfiguracyjnego
-    pylint_opts.extend(modules)
+    pylint_opts = modules
     return pylint.lint.Run(pylint_opts, do_exit=False)
 
 
