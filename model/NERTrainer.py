@@ -5,4 +5,5 @@ class NERTrainer:
 
     def train(self, data):
         # Implementacja trenowania modelu NER na dostarczonych danych
+        pass
         return trained_model
