@@ -9,7 +9,7 @@ api_key = os.getenv("LLAMA_API_KEY")
 API_URL = "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct"
 headers = {"Authorization": f'Bearer {api_key}'}
 
-CLASSIFICATION_LABELS = ['job title', 'company name', 'location', 'job-type', 'is_remote_work_bool', 'education', 'spoken_languages', 'technologies', 'salary', 'requirements', 'years_of_experience', 'responsibilities']
+CLASSIFICATION_LABELS = ['job title', 'company name', 'location', 'job-type', 'salary', 'is_remote_work_bool', 'education', 'spoken_languages', 'company_expectations', 'technologies', 'requirements', 'years_of_experience', 'responsibilities']
 
 def query(payload):
     response = requests.post(API_URL, headers=headers, json=payload)
@@ -20,7 +20,7 @@ def get_response(job_description):
     labels_prompt = f'Respond only in English. You are a robot that only outputs JSON. you reply in JSON format with the fields in english {", ".join(CLASSIFICATION_LABELS)} in english'
     # details_prompt = "Example answer: {'jobTitle':'Senior Java Developer', 'companyName':'ABC'}"
 
-    final_prompt = f'{labels_prompt} for job description in foreign language - transform it to ENGLISH: <|description_start|>{job_description}<|description_end|>. Respond in full English only as shown, with no additional discursive or explanatory text. Do not classify values related with addresses as salary! Do not classify values not related with salary as salary. Translate everything to English. You know only English and respond only in English.'
+    final_prompt = f'{labels_prompt} for job description in foreign language - transform it to ENGLISH: <|description_start|>{job_description}<|description_end|>. Respond in English only as shown, with no additional discursive or explanatory text. Do not classify values related with addresses as salary! Do not classify values not related with salary as salary. Translate everything to English. You know only English and respond only in English.'
 
     print(final_prompt)
 
