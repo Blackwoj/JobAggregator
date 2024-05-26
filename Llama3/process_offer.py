@@ -1,13 +1,13 @@
 import json
 from main import get_response
 
-with open('../../scrapped/scrap.bulldog_jobs_short.json', 'r', encoding="utf8") as file:
+with open('../../scrapped/scrap.bulldog_jobs.json', 'r', encoding="utf8") as file:
     data = json.load(file)
 
 processed_offers = []
-for x in data:
+for i, x in enumerate(data):
     job_description = x['htmlData']
-    print(x['_id'])
+    print(i, x['_id'])
 
     try:
         response = get_response(job_description)
