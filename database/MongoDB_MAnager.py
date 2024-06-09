@@ -1,53 +1,58 @@
-from pathlib import Path
-import pymongo
-import pymongo.aggregation
-import pymongo.auth
-import json
 import logging
+import os
+from dotenv import load_dotenv
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+import json
+from pathlib import Path
+load_dotenv()
 
-LOGIN_DATA_FOLDER = Path(__file__).resolve().parent.parent
-LOGIN_DATA = LOGIN_DATA_FOLDER / "LOGIN_DATA.json"
 
+class DbManager:
 
-class DbManager():
+    LOGIN = os.getenv("MONGODB_USERNAME")
+    PASSWORD = os.getenv("MONGODB_PASSWORD")
 
-    def __init__(self, cluster_name: str = ""):
+    def __init__(self):
+        print(self.LOGIN, self.PASSWORD)
+        self.connect_string = f"mongodb+srv://{self.LOGIN}:{self.PASSWORD}@jobaggregator.vxkjxno.mongodb.net/?retryWrites=true&w=majority&appName=JobAggregator"
+        self.client = MongoClient(self.connect_string, server_api=ServerApi('1'))
+        try:
+            self.client.admin.command('ping')
+            logging.info("Pinged your deployment. You successfully connected to MongoDB!")
+            print("Pinged your deployment. You successfully connected to MongoDB!")
+        except Exception as e:
+            logging.error(e)
+        job_db = self.client.get_database("JobAggregator")
+        self.collection = job_db.get_collection("Ogloszenie")
 
-        self.has_logging_data = self._get_login_data()
-        self.has_connected = False
+    def add_docs(self, docs: dict):
+        try:
+            self.collection.insert_one(docs)
+            logging.info("Insert success")
+        except Exception as e:
+            logging.error(e)
 
-    def _get_login_data(self):
-        if LOGIN_DATA.exists():
-            try:
-                with LOGIN_DATA.open('r') as _login_data: 
-                    self._login_data = json.load(_login_data)
-            except json.JSONDecodeError:
-                logging.error("Wrong json format in file: %s", LOGIN_DATA)
-        else:
-            logging.error("Missing LOGIN_DATA.json file in %s location", LOGIN_DATA_FOLDER)
-        if "username" in self._login_data.keys() and "password" in self._login_data.keys():
-            if not self._login_data["username"]: 
-                logging.error("Cannot connect to mongoDB due to missing username value!!!")
-            elif not self._login_data["password"]: 
-                logging.error("Cannot connect to mongoDB due to missing password value!!!")
-            else: 
-                logging.info("Login data to MongoDB get successfully!")
-                return True
-        else:
-            logging.error("Missing logging data ni LOGIN_DATA.json file!!!")
-        return False
+# example ############################################################################
+# db_manager = DbManager()
 
-    def connect_to_cluster(self):
-        if not self.has_logging_data:
-            logging.info("Missing login data to mongo trying to get it again!")
-            self.has_logging_data = self._get_login_data()
-            if not self.has_logging_data:
-                logging.error("Cannot get data to login into mongodb! Check %s", LOGIN_DATA)
-                self.has_connected = False
-        if self.has_logging_data:
-            pass
-        # return self.has_connected
-        
-        
-# client = MongoClient("mongodb://localhost:27017/", ssl=True, ssl_certfile="moj_certyfikat_klienta.pem")
-# db = client["moja_baza"]
+# test_data = {
+#     "job_title": "Power Media Senior Java Developer",
+#     "company_name": "Power Media",
+#     "location": "Gdańsk",
+#     "job_type": "Full-time",
+#     "technologies": ["Java", "Spring Boot", "Spring", "Hibernate", "AWS", "SQL", "Oracle"],
+#     "salary": None,
+#     "requirements": [
+#       "min. 6 years of experience in Java programming",
+#       "practical experience with JEE, Spring Boot, Hibernate",
+#       "knowledge of SOLID principles in code development",
+#       "knowledge of unit tests",
+#       "knowledge of technologies: Java 8+, Maven, Unix, Linux, Github, Bitbucket",
+#       "experience in designing REST API and deploying RESTful services",
+#       "experience in designing databases using SQL, Oracle/SQL Server, Redis",
+#       "very good knowledge of English (min. B2)"
+#     ]
+# }
+
+# db_manager.add_docs(test_data)
