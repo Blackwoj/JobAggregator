@@ -5,7 +5,7 @@ import pymongo.auth
 import json
 import logging
 
-LOGIN_DATA_FOLDER = Path(__file__).resolve().parent
+LOGIN_DATA_FOLDER = Path(__file__).resolve().parent.parent
 LOGIN_DATA = LOGIN_DATA_FOLDER / "LOGIN_DATA.json"
 
 
@@ -43,7 +43,10 @@ class DbManager():
             self.has_logging_data = self._get_login_data()
             if not self.has_logging_data:
                 logging.error("Cannot get data to login into mongodb! Check %s", LOGIN_DATA)
-                return False
+                self.has_connected = False
+        if self.has_logging_data:
+            pass
+        # return self.has_connected
         
         
 # client = MongoClient("mongodb://localhost:27017/", ssl=True, ssl_certfile="moj_certyfikat_klienta.pem")
