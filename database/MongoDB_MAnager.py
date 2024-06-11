@@ -20,22 +20,20 @@ class DbManager:
         try:
             self.client.admin.command('ping')
             logging.info("Pinged your deployment. You successfully connected to MongoDB!")
-            print("Pinged your deployment. You successfully connected to MongoDB!")
         except Exception as e:
-            print(e)
             logging.error(e)
         job_db = self.client.get_database("JobAggregator")
         self.collection = job_db.get_collection("Ogloszenie")
 
     def add_docs(self, doc: dict):
         if not self.check_duplicate(doc, ["url"]):
-            print("Value: %s, not passed to db!", doc)
+            logging.info("Value: %s, not passed to db!", doc)
             return
         try:
             self.collection.insert_one(doc)
-            print("Insert success")
+            logging.info("Insert success")
         except Exception as e:
-            print(e)
+            logging.error(e)
 
     def check_duplicate(self, docs: dict, key_columns: list[str]):
         distinct = True
