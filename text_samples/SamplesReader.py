@@ -21,16 +21,18 @@ class SamplesReader:
             logging.warning("No text in passed location: %s", self._files_path_location)
         return all_texts
 
-    def read_json_file(self) -> dict[str, str]:
+    def read_json_file(self) -> list[dict[str, str]]:
         all_json_files = self._files_path_location.glob("*.json")
 
-        all_text = {}
+        all_text = []
 
         for json_file in all_json_files:
             with json_file.open('r', encoding='utf-8') as file:
-                readed_json = json.load(file)
-                all_text[json_file.name] = readed_json
-
+                reader_json = json.load(file)
+                print(reader_json[1], type(reader_json))
+                for i in range(len(reader_json)):
+                    if reader_json[i]["career_site"] != "not found":
+                        all_text.append(reader_json)
         if not all_text:
             logging.warning("No text in passed location: %s", self._files_path_location)
         return all_text
