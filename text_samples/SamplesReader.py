@@ -8,7 +8,7 @@ class SamplesReader:
     def __init__(self, files_path_location: Path = Path(__file__).resolve().parent / "samples"):
         self._files_path_location = files_path_location
 
-    def read_files(self) -> dict[str, str]:
+    def read_txt_files(self) -> dict[str, str]:
         all_txt_files = self._files_path_location.glob('*.txt')
 
         all_texts = {}  # Lista przechowująca zawartość wszystkich plików tekstowych
@@ -21,7 +21,7 @@ class SamplesReader:
             logging.warning("No text in passed location: %s", self._files_path_location)
         return all_texts
 
-    def read_json_file(self) -> dict[str, str]:
+    def read_json_file(self) -> list[dict[str, str]]:
         all_json_files = self._files_path_location.glob("*.json")
 
         all_text = {}
