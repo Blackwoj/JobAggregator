@@ -14,7 +14,6 @@ class DbManager:
     PASSWORD = os.getenv("MONGODB_PASSWORD")
 
     def __init__(self):
-        print(self.LOGIN, self.PASSWORD)
         self.connect_string = f"mongodb+srv://{self.LOGIN}:{self.PASSWORD}@jobaggregator.vxkjxno.mongodb.net/?retryWrites=true&w=majority&appName=JobAggregator"
         self.client = MongoClient(self.connect_string, server_api=ServerApi('1'))
         try:
@@ -26,7 +25,7 @@ class DbManager:
         self.collection = job_db.get_collection("Ogloszenie")
 
     def add_docs(self, doc: dict):
-        if not self.check_duplicate(doc, ["url"]):
+        if not self.check_duplicate(doc, ["job_offer_url"]):
             logging.info("Value: %s, not passed to db!", doc)
             return
         try:
@@ -42,3 +41,10 @@ class DbManager:
             if docs[column] in distinct_values:
                 distinct = False
         return distinct
+
+    def check_hash(self, record, new_hash) -> bool:
+        existing_record = self.collection.find_one({"job_offer_url": record["job_offer_url"]})
+        if existing_record and existing_record["hash"] != new_hash:
+            return False
+        else:
+            return True
