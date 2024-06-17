@@ -25,9 +25,6 @@ class DbManager:
         self.collection = job_db.get_collection("Ogloszenie")
 
     def add_docs(self, doc: dict):
-        if not self.check_duplicate(doc, ["job_offer_url"]):
-            logging.info("Value: %s, not passed to db!", doc)
-            return
         try:
             self.collection.insert_one(doc)
             logging.info("Insert success")
@@ -45,6 +42,9 @@ class DbManager:
     def check_hash(self, record, new_hash) -> bool:
         existing_record = self.collection.find_one({"job_offer_url": record["job_offer_url"]})
         if existing_record:
-            if existing_record["hash"] == new_hash:
+            if existing_record["hash_id"] == new_hash:
                 return True
         return False
+
+    def delete_record(self, query: dict[str, str]):
+        self.collection.delete_one(query)
