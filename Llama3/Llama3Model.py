@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import requests
 import logging
 from typing import Optional
-
+import ast
 load_dotenv()
 
 
@@ -64,6 +64,9 @@ class Llama3Model:
             }
         })
         if output:
-            return output[0]['generated_text']
+            try:
+                return ast.literal_eval(output[0]['generated_text'])
+            except Exception as e:
+                logging.error("Something occured while parsing model output: %s", e)
         else:
             logging.info("Model did not return value!")
