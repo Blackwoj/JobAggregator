@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import requests
 import logging
+from typing import Optional
 
 load_dotenv()
 
@@ -17,7 +18,7 @@ class Llama3Model:
     def _query(self, payload):
         if self.API_KEY:
             try:
-                response = requests.post(self.API_KEY, headers=self.header, json=payload)
+                response = requests.post(self.model_ulr, headers=self.header, json=payload)
                 return response.json()
             except Exception as e:
                 logging.error(e)
@@ -49,7 +50,7 @@ class Llama3Model:
             'Respond only as shown, with no additional discursive or explanatory text.'
         ])
 
-    def classify_offer(self, offer_des):
+    def classify_offer(self, offer_des) -> Optional[dict[str, str]]:
         output = self._query({
             "inputs": ''.join([
                 '<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n',
@@ -65,4 +66,4 @@ class Llama3Model:
         if output:
             return output[0]['generated_text']
         else:
-            logging.info("Model dod not return value!")
+            logging.info("Model did not return value!")

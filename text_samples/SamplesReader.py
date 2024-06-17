@@ -1,7 +1,7 @@
 from pathlib import Path
 import logging
 import json
-from ..textProcessing.html_cleaner import extract_texts_from_html
+from textProcessing.html_cleaner import extract_texts_from_html
 
 class SamplesReader:
 
@@ -29,6 +29,7 @@ class SamplesReader:
             with json_file.open('r', encoding='utf-8') as file:
                 reader_json = json.load(file)
                 for i in range(len(reader_json)):
+                    logging.info("Reading example: %s from file %s", i, file.name)
                     if reader_json[i]["career_site"] != "not found":
                         all_text.append(self.clear_html(reader_json[i]))
         if not all_text:
