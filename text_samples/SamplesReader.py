@@ -1,7 +1,7 @@
 from pathlib import Path
 import logging
 import json
-
+from ..textProcessing.html_cleaner import extract_texts_from_html
 
 class SamplesReader:
 
@@ -30,7 +30,12 @@ class SamplesReader:
                 reader_json = json.load(file)
                 for i in range(len(reader_json)):
                     if reader_json[i]["career_site"] != "not found":
-                        all_text.append(reader_json[i])
+                        all_text.append(self.clear_html(reader_json[i]))
         if not all_text:
             logging.warning("No text in passed location: %s", self._files_path_location)
         return all_text
+
+    def clear_html(self, offer: dict[str, str]):
+        cleaned_offer = offer["cleaned_html"]
+        offer["cleaned_html"] = extract_texts_from_html(cleaned_offer)
+        return offer
