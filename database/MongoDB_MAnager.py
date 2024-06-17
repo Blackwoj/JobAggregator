@@ -44,7 +44,7 @@ class DbManager:
 
     def check_hash(self, record, new_hash) -> bool:
         existing_record = self.collection.find_one({"job_offer_url": record["job_offer_url"]})
-        if existing_record and existing_record["hash"] != new_hash:
-            return False
-        else:
-            return True
+        if existing_record:
+            if existing_record["hash"] == new_hash:
+                return True
+        return False
