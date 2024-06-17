@@ -16,7 +16,7 @@ def calculate_hash(text):
 
 base_folder_path = Path(__file__).resolve().parent
 sample_text_folder = base_folder_path / "Samples"
-
+unprocessed_file = {}
 if __name__ == "__main__":
     text_classification_model = Llama3Model()
     text_reader = SamplesReader()
@@ -31,9 +31,16 @@ if __name__ == "__main__":
                 logging.info("Hash exist!")
                 continue
             db_manager.delete_record({"job_offer_url": text["job_offer_url"]})
-        model_output = text_classification_model.classify_offer(text["cleaned_html"])
+        model_output = None
+        try:
+            model_output = text_classification_model.classify_offer(text["cleaned_html"])
+        except Exception:
+            logging.info("Tokens are out!!!!")
 
         if model_output:
-            text.update(model_output)
-            db_manager.add_docs(text)
-            logging.info("Offer pushed to mongodb!")
+            try:
+                text.update(model_output)
+                db_manager.add_docs(text)
+                logging.info("Offer pushed to mongodb!")
+            except Exception as e:
+                logging.error("Something went wrong: %s! Here is model output: %s", e, model_output)

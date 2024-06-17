@@ -51,15 +51,16 @@ class Llama3Model:
         ])
 
     def classify_offer(self, offer_des) -> Optional[dict[str, str]]:
+        self.offer_description = offer_des
         output = self._query({
             "inputs": ''.join([
                 '<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n',
-                '{}'.format(self.final_prompt(offer_des)),
+                '{}'.format(self.final_prompt(self.offer_description)),
                 '<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n',
             ]),
             "parameters": {
                 "return_full_text": False,
-                "max_new_tokens": 300,
+                "max_new_tokens": 500,
                 "stop": ["<|end_of_text|>", "<|eot_id|>"]
             }
         })
@@ -67,6 +68,6 @@ class Llama3Model:
             try:
                 return ast.literal_eval(output[0]['generated_text'])
             except Exception as e:
-                logging.error("Something occured while parsing model output: %s", e)
+                logging.error("Something occured while parsing model output: %s, %s", e, output[0]['generated_text'])
         else:
             logging.info("Model did not return value!")
